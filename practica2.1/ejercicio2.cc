@@ -104,13 +104,16 @@ int main(int argc, char *argv[])
             send[timeBytes] = '\n';
             sendto(sd, send, timeBytes + 1, 0, &client, client_len);
            break;
-       case 'q':
-           printf("Saliendo...\n");           
+      case 'q':
+           printf("Saliendo...\n"); 
+           sendto(sd, "Cerrando...", 21, 0, &client, client_len);         
            return 0;
        default:
-           printf("Comando no soportado %s", buffer);
-          
+           printf("Comando no soportado %s\n", buffer);
+           sendto(sd, "Comando erróneo", 21, 0, &client, client_len);
            break;
+       
+
        }
  
       
