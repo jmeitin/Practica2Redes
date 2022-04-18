@@ -1,3 +1,5 @@
+//compilar con g++ -pthread
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
