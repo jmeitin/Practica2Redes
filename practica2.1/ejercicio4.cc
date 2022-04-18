@@ -66,7 +66,7 @@ while(1){
    getnameinfo((struct sockaddr *) &cliente_addr, cliente_len, host, NI_MAXHOST, serv, NI_MAXSERV, NI_NUMERICHOST|NI_NUMERICSERV);
    printf("Conexión desde Host:%s Puerto:%s\n",host, serv);
    if(cliente_sd < 0){
-       fprintf(stderr, "Connection not accepted");
+      fprintf(stderr, "Connection not accepted %s" , gai_strerror(cliente_sd));
        return -1;
    }
    else{
@@ -81,7 +81,7 @@ while(1){
            break;
        }
        else if(l == -1){
-       fprintf(stderr, "client_sd not redeable");
+       fprintf(stderr, "client_sd not redeable %s", gai_strerror(l));
        }
        else {
      
@@ -94,4 +94,5 @@ while(1){
    return 0;
  
 }
+ 
 
