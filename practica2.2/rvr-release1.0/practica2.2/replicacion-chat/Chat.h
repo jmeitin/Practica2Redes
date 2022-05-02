@@ -19,7 +19,7 @@
  *  | Nick: char[8]     | Nick incluido el char terminación de cadena '\0'
  *  +-------------------+
  *  |                   |
- *  | Mensaje: char[80] | Mensaje incluido el char terminación de cadena '\0'
+ *  | Mensaje: char[NAME_SIZE] | Mensaje incluido el char terminación de cadena '\0'
  *  |                   |
  *  +-------------------+
  *
