@@ -48,17 +48,6 @@ int ChatMessage::from_bin(char * bobj)
 
     return 0;
 
-
-    
-    memcpy(name, tmp, NAME_SIZE*sizeof(char)); 
-    tmp += NAME_SIZE *sizeof(char);
-    memcpy(&x, tmp, sizeof(int16_t));
-    tmp += sizeof(int16_t);
-    memcpy(&y, tmp, sizeof(int16_t)); 
-    tmp += sizeof(int16_t); 
-        
-        
-    return 0;
 }
 
 // -----------------------------------------------------------------------------
@@ -78,7 +67,33 @@ void ChatServer::do_messages()
         // - LOGIN: Añadir al vector clients
         // - LOGOUT: Eliminar del vector clients
         // - MESSAGE: Reenviar el mensaje a todos los clientes (menos el emisor)
+
+
+        Socket* clientSd;
+        ChatMessage message;
+        socket.recv(message, clientSd);
+       
+        if (message.type == ChatMessage::MessageType::LOGIN) {
+            std::unique_ptr<Socket> uPtr(clientSd);
+            clients.push_back(uPtr);
+            std::cout << message.nick << " logged in\n";            
+        }
+        else if (message.type == ChatMessage::MessageType::LOGOUT) {           
+            auto it = clients.begin();
+            while (it != clients.end() && !(*(*it).get() == *clientSd)) it++;
+            clients.erase(it);
+            std::cout << message.nick << " logged out\n";
+        }
+        else if (message.type == ChatMessage::MessageType::MESSAGE) {            
+            for (int i = 0; i < clients.size(); ++i) {
+                if (!(*(clients[i].get()) == *clientSd))
+                    socket.send(message, (*clients[i].get()));
+            }
+            std::cout << message.nick << " sent a message\n";
+        }
     }
+
+
 }
 
 // -----------------------------------------------------------------------------
