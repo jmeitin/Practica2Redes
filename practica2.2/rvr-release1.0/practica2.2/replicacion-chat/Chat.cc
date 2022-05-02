@@ -19,7 +19,7 @@ void ChatMessage::to_bin()
     memcpy(tmp, nick.c_str(), 8*sizeof(char));
     tmp += 8*sizeof(char);
 
-    memcpy(tmp, message.c_str(), sizeof(int16_t));
+    memcpy(tmp, message.c_str(), 80*sizeof(char));
 }
 
 int ChatMessage::from_bin(char * bobj)
@@ -75,7 +75,7 @@ void ChatServer::do_messages()
        
         if (message.type == ChatMessage::MessageType::LOGIN) {
             std::unique_ptr<Socket> uPtr(clientSd);
-            clients.push_back(uPtr);
+            clients.push_back(std::move(uPtr));
             std::cout << message.nick << " logged in\n";            
         }
         else if (message.type == ChatMessage::MessageType::LOGOUT) {           
@@ -112,6 +112,12 @@ void ChatClient::login()
 void ChatClient::logout()
 {
     // Completar
+    std::string msg;
+
+    ChatMessage em(nick, msg);
+    em.type = ChatMessage::LOGOUT;
+
+    socket.send(em, socket);
 }
 
 void ChatClient::input_thread()
@@ -120,6 +126,15 @@ void ChatClient::input_thread()
     {
         // Leer stdin con std::getline
         // Enviar al servidor usando socket
+        std::string msg;
+        std::getline(std::cin, msg);
+        if (msg == "q" || msg == "Q" ) {
+            logout();
+            break;
+        }
+        ChatMessage chatMsg(nick, msg);
+        chatMsg.type = ChatMessage::MessageType::MESSAGE;
+        socket.send(chatMsg, socket);
     }
 }
 
@@ -129,6 +144,10 @@ void ChatClient::net_thread()
     {
         //Recibir Mensajes de red
         //Mostrar en pantalla el mensaje de la forma "nick: mensaje"
+        ChatMessage chatMsg;
+        socket.recv(chatMsg);
+        if(chatMsg.type == ChatMessage::MessageType::LOGOUT)break;
+        std::cout << chatMsg.nick << ": " << chatMsg.message << "\n";
     }
 }
 
