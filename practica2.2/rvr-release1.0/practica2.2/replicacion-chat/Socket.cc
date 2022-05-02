@@ -59,7 +59,6 @@ int Socket::send(Serializable& obj, const Socket& sock)
     //Serializar el objeto
     //Enviar el objeto binario a sock usando el socket sd
     obj.to_bin();
-
     ssize_t size = sendto(sd, obj.data(), obj.size(), 0, &sock.sa, sock.sa_len);
     if(size > 0 ) return 0;
     printf("Error sendto: %s\n", gai_strerror(size));
